@@ -1,13 +1,19 @@
 package br.com.victor.orgs.ui.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import br.com.victor.orgs.R
-import br.com.victor.orgs.dao.ProdutosDao
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import br.com.victor.orgs.database.AppDataBase
 import br.com.victor.orgs.databinding.ActivityFormularioProdutoBinding
+import br.com.victor.orgs.extesions.carregaImageLoader
+import br.com.victor.orgs.extesions.tentaCarregarImagem
 import br.com.victor.orgs.model.Produto
+import br.com.victor.orgs.ui.dialog.FormularioImagemDialog
+import coil.ImageLoader
+import coil.imageLoader
+import coil.load
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class FormularioProdutoActivity : AppCompatActivity() {
@@ -16,34 +22,82 @@ class FormularioProdutoActivity : AppCompatActivity() {
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
     }
 
+    private var url: String? = null
+    private var produtoId = 0L
+
+    private val produtoDao by lazy {
+        AppDataBase.getInstance(this).produtoDao()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        title = "Cadastrar Produtos"
         configuraBotaoSalvar()
+        val imageLoader = carregaImageLoader(this)
+
+        binding.formularioProdutoImageview.setOnClickListener {
+            FormularioImagemDialog(this).mostraDialog(url) { imagem ->
+                url = imagem
+                binding.formularioProdutoImageview.tentaCarregarImagem(url, imageLoader)
+
+            }
+        }
+
+        tentaCarregarProduto()
+        lifecycleScope.launch {
+            produtoDao.buscaProdutoId(produtoId).collect { produto ->
+                produto?.let {
+                    setTitle("Editar Produto ${it.nome}")
+                    preencheCampos(it, imageLoader)
+                }
+
+            }
+        }
+
+
+    }
+
+
+
+    private fun tentaCarregarProduto() {
+        produtoId = intent.getLongExtra(CHAVE_PRODUTO_ID, 0L)
+    }
+
+    private fun preencheCampos(it: Produto, imageLoader: ImageLoader) {
+
+        url = it.imagem
+        binding.formularioProdutoImageview.tentaCarregarImagem(it.imagem, imageLoader)
+        binding.formularioProdutoEdittextNome.setText(it.nome)
+        binding.formularioProdutoEdittextDesc.setText(it.descricao)
+        binding.formularioProdutoEdittextValor.setText(it.preco.toPlainString())
     }
 
     private fun configuraBotaoSalvar() {
         val botaoSalvar = binding.botaoSalvar
-        val dao = ProdutosDao()
         botaoSalvar.setOnClickListener {
-            criaProdutoNovo()
-            val produtoNovo = criaProdutoNovo()
-            dao.adiciona(produtoNovo)
-            finish()
+            lifecycleScope.launch {
+                val produtoNovo = criaProdutoNovo()
+                produtoDao.salva(produtoNovo)
+                finish()
+            }
+
 
 
 
         }
     }
 
-    private fun criaProdutoNovo():Produto {
-        val campoNome = binding.editTextNome
+    private fun criaProdutoNovo(): Produto {
+        val campoNome = binding.formularioProdutoEdittextNome
         val nome = campoNome.text.toString()
 
-        val campoDescricao = binding.editTextDescricao
+
+        val campoDescricao = binding.formularioProdutoEdittextDesc
         val descricao = campoDescricao.text.toString()
 
-        val campoValor = binding.editTextValor
+        val campoValor = binding.formularioProdutoEdittextValor
         val valorEmTexto = campoValor.text.toString()
         val valor = if (valorEmTexto.isBlank()) {
             BigDecimal.ZERO
@@ -52,12 +106,15 @@ class FormularioProdutoActivity : AppCompatActivity() {
         }
 
 
+
+
         return Produto(
+            id = produtoId,
             nome = nome,
             descricao = descricao,
-            preco = valor
+            preco = valor,
+            imagem = url
         )
-
 
 
     }
