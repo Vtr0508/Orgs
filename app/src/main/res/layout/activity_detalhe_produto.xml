@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".ui.activity.DetalheProdutoActivity">
+
+        <ImageView
+            android:id="@+id/detalhe_produto_imageview"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:contentDescription="Imagem Produto"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+
+        <TextView
+            android:id="@+id/detalhe_produto_textview_titulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textSize="28sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detalhe_produto_textview_valor"
+            app:layout_constraintVertical_bias="0.0"
+            tools:text="@tools:sample/lorem[10]" />
+
+        <TextView
+            android:id="@+id/detalhe_produto_textview_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:layout_constraintEnd_toStartOf="parent"
+            android:textSize="20sp"
+            android:fontFamily="@font/montserrat"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detalhe_produto_textview_titulo"
+            tools:text="@tools:sample/lorem/random"/>
+
+
+        <TextView
+            android:id="@+id/detalhe_produto_textview_valor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/plano_de_fundo_arredondado"
+            android:elevation="10dp"
+            android:layout_margin="16dp"
+            android:padding="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@id/detalhe_produto_imageview"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detalhe_produto_imageview"
+            tools:text="R$1299,99" />
+
+
+
+        
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
