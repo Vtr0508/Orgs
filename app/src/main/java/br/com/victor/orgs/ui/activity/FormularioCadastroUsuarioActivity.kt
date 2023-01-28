@@ -1,7 +1,6 @@
 package br.com.victor.orgs.ui.activity
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -24,26 +23,31 @@ class FormularioCadastroUsuarioActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         configuraBotaoCadastrar()
+
     }
 
     private fun configuraBotaoCadastrar() {
         binding.activityFormularioCadastroBotaoCadastrar.setOnClickListener {
             val novoUsuario = criaUsuario()
 
-            lifecycleScope.launch {
-                try {
-                    usuarioDao.salva(novoUsuario)
-                    finish()
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        this@FormularioCadastroUsuarioActivity,
-                        "Usuario ja cadastrado",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            cadastraNovoUsuario(novoUsuario)
+
+
+        }
+    }
+
+    private fun cadastraNovoUsuario(usuario: Usuario) {
+        lifecycleScope.launch {
+            try {
+                usuarioDao.salva(usuario)
+                finish()
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@FormularioCadastroUsuarioActivity,
+                    "Usuario ja cadastrado",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-
-
         }
     }
 

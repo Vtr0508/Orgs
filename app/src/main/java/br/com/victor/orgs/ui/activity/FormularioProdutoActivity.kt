@@ -1,6 +1,7 @@
 package br.com.victor.orgs.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import br.com.victor.orgs.database.AppDataBase
@@ -8,6 +9,8 @@ import br.com.victor.orgs.databinding.ActivityFormularioProdutoBinding
 import br.com.victor.orgs.extesions.carregaImageLoader
 import br.com.victor.orgs.extesions.tentaCarregarImagem
 import br.com.victor.orgs.model.Produto
+import br.com.victor.orgs.preferences.dataStore
+import br.com.victor.orgs.preferences.usuarioLogadoPreferences
 import br.com.victor.orgs.ui.dialog.FormularioImagemDialog
 import coil.ImageLoader
 import coil.imageLoader
@@ -29,6 +32,10 @@ class FormularioProdutoActivity : AppCompatActivity() {
         AppDataBase.getInstance(this).produtoDao()
     }
 
+    private val usuarioDao by lazy {
+        AppDataBase.getInstance(this).usuarioDao()
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,12 +54,27 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
         tentaCarregarProduto()
         lifecycleScope.launch {
-            produtoDao.buscaProdutoId(produtoId).collect { produto ->
-                produto?.let {
-                    setTitle("Editar Produto ${it.nome}")
-                    preencheCampos(it, imageLoader)
-                }
+            launch {
+                produtoDao.buscaProdutoId(produtoId).collect { produto ->
+                    produto?.let {
+                        setTitle("Editar Produto ${it.nome}")
+                        preencheCampos(it, imageLoader)
+                    }
 
+                }
+            }
+
+
+            launch {
+                dataStore.data.collect{preferences ->
+                    preferences[usuarioLogadoPreferences]?.let { usuarioId ->
+                        usuarioDao.buscaPorId(usuarioId).collect{
+                            Log.i("Chegou!", "formulario $it ")
+                        }
+
+                    }
+
+                }
             }
         }
 
