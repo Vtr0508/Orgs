@@ -11,7 +11,7 @@ import br.com.victor.orgs.database.dao.UsuarioDao
 import br.com.victor.orgs.model.Produto
 import br.com.victor.orgs.model.Usuario
 
-@Database(entities = [Produto::class,Usuario::class], version = 2, exportSchema = false)
+@Database(entities = [Produto::class,Usuario::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDataBase : RoomDatabase() {
 
@@ -25,7 +25,7 @@ abstract class AppDataBase : RoomDatabase() {
                 context,
                 AppDataBase::class.java,
                 "orgs.db"
-            )
+            ).addMigrations(MIGRATION_2_3)
                 .build().also {
                     db = it
                 }

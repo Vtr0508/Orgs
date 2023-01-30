@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-class FormularioProdutoActivity : AppCompatActivity() {
+class FormularioProdutoActivity : UsuarioBaseActivity() {
 
     private val binding by lazy {
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
@@ -65,22 +65,10 @@ class FormularioProdutoActivity : AppCompatActivity() {
             }
 
 
-            launch {
-                dataStore.data.collect{preferences ->
-                    preferences[usuarioLogadoPreferences]?.let { usuarioId ->
-                        usuarioDao.buscaPorId(usuarioId).collect{
-                            Log.i("Chegou!", "formulario $it ")
-                        }
-
-                    }
-
-                }
-            }
         }
 
 
     }
-
 
 
     private fun tentaCarregarProduto() {
@@ -100,18 +88,21 @@ class FormularioProdutoActivity : AppCompatActivity() {
         val botaoSalvar = binding.botaoSalvar
         botaoSalvar.setOnClickListener {
             lifecycleScope.launch {
-                val produtoNovo = criaProdutoNovo()
-                produtoDao.salva(produtoNovo)
-                finish()
+
+                usuario.value?.let {usuario ->
+                    val produtoNovo = criaProdutoNovo(usuario.id)
+                    produtoDao.salva(produtoNovo)
+                    finish()
+                }
+
+
             }
-
-
 
 
         }
     }
 
-    private fun criaProdutoNovo(): Produto {
+    private fun criaProdutoNovo(usuarioId: String): Produto {
         val campoNome = binding.formularioProdutoEdittextNome
         val nome = campoNome.text.toString()
 
@@ -135,7 +126,8 @@ class FormularioProdutoActivity : AppCompatActivity() {
             nome = nome,
             descricao = descricao,
             preco = valor,
-            imagem = url
+            imagem = url,
+            usuarioId = usuarioId
         )
 
 

@@ -22,8 +22,8 @@ abstract class UsuarioBaseActivity : AppCompatActivity() {
         AppDataBase.getInstance(this).usuarioDao()
     }
 
-    private var _usuario: MutableStateFlow<Usuario?> = MutableStateFlow(null)
-    protected var usuario: StateFlow<Usuario?> = _usuario
+    private val _usuario: MutableStateFlow<Usuario?> = MutableStateFlow(null)
+    protected val usuario: StateFlow<Usuario?> = _usuario
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,10 +37,6 @@ abstract class UsuarioBaseActivity : AppCompatActivity() {
     }
 
 
-
-
-
-
     private suspend fun verificaUsuarioLogado() {
         dataStore.data.collect { preferences ->
             preferences[usuarioLogadoPreferences]?.let { usuarioId ->
@@ -51,11 +47,13 @@ abstract class UsuarioBaseActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun buscaUsuario(usuarioId: String) {
+    private suspend fun buscaUsuario(usuarioId: String): Usuario? {
 
-        _usuario.value = usuarioDao
+        return usuarioDao
             .buscaPorId(usuarioId)
-            .firstOrNull()
+            .firstOrNull().also {
+                _usuario.value = it
+            }
 
     }
 
@@ -67,7 +65,7 @@ abstract class UsuarioBaseActivity : AppCompatActivity() {
     }
 
     protected fun vaiParaLogin() {
-        vaiPara(LoginActivity::class.java){
+        vaiPara(LoginActivity::class.java) {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         finish()
